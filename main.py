@@ -143,6 +143,13 @@ class GoodInfoList:
             if good_info.name == name:
                 self.good_info_list.remove(good_info)
 
+    def remove_last(self):
+        """
+        Удаляет из GoodInfoList последний объект GoodInfo
+        :param name: str
+        """
+        del self.good_info_list[-1]
+
     def get_max_cost(self):
         """
         Возвращает список товаров с макс стоимостью
@@ -266,3 +273,5 @@ print("Средняя цена товара: {} \n".format(average_price))
 print("Самые дорогие товары: {} \n".format(max_cost_goods))
 print("Самые дешевые товары: {} \n".format(min_cost_goods))
 print("Заканчивается товар: {} \n".format(min_quantity_goods))
+
+
