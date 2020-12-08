@@ -85,6 +85,9 @@ class GoodInfoList:
         else:
             raise AttributeError('{}'.format(key))
 
+    def __len__(self):
+        return len(self.good_info_list)
+
     def read_from_file(self, file):
         """
         Создает GoodInfoList из файла записей формата str:int:int,
