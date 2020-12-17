@@ -68,7 +68,10 @@ class GoodInfoList:
         self.good_info_list = []
 
     def __str__(self):
-        return f'{self.good_info_list}'
+        result = []
+        for good in self.good_info_list:
+            result.append(str(good))
+        return f'{result}'
 
     def __getitem__(self, key):
         """
@@ -146,8 +149,11 @@ class GoodInfoList:
     def remove_last(self):
         """
         Удаляет из GoodInfoList последний объект GoodInfo
+        :return: class Good
         """
+        last = self.good_info_list[-1]
         del self.good_info_list[-1]
+        return last
 
     def get_max_cost(self):
         """
@@ -286,3 +292,13 @@ print("Средняя цена товара: {} \n".format(average_price))
 print("Самые дорогие товары: {} \n".format(max_cost_goods))
 print("Самые дешевые товары: {} \n".format(min_cost_goods))
 print("Заканчивается товар: {} \n".format(min_quantity_goods))
+
+print(goods_list, "\n")
+# __len__() для GoodInfolist
+print(len(goods_list))
+# get_std() получает среднее отклонение для всех цен товаров
+print(goods_list.get_std())
+# remove_last() удаляет последний товар
+print(goods_list.remove_last())
+
+print(goods_list, "\n")
