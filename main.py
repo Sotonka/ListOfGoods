@@ -146,7 +146,6 @@ class GoodInfoList:
     def remove_last(self):
         """
         Удаляет из GoodInfoList последний объект GoodInfo
-        :param name: str
         """
         del self.good_info_list[-1]
 
@@ -258,6 +257,20 @@ class GoodInfoList:
             count += good[1]
         return count / len(self.good_info_list)
 
+    def get_std(self):
+        """
+        Получает среднее отклонение для всех цен товаров
+        :return: float
+        """
+        average = self.get_average_price()
+        summ = 0
+        for good in self.good_info_list:
+            summ += (good.price - average) ** 2
+
+        std = (summ / len(self.good_info_list)) ** .5
+
+        return std
+
 
 goods_list = GoodInfoList()
 goods_list.read_from_file('goods')
@@ -273,5 +286,3 @@ print("Средняя цена товара: {} \n".format(average_price))
 print("Самые дорогие товары: {} \n".format(max_cost_goods))
 print("Самые дешевые товары: {} \n".format(min_cost_goods))
 print("Заканчивается товар: {} \n".format(min_quantity_goods))
-
-
