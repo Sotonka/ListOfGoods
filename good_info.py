@@ -10,7 +10,7 @@ class GoodInfo:
         name: str - название товара
         quantity: int - количество
         price: int - цена
-        delivery_date: date - дата поставки
+        delivery_date: string yyyy-mm-dd - дата поставки
         expiration_date: int - срок годности
     Методы:
         __init__(self, str, int, int, date, int)
@@ -148,6 +148,24 @@ class GoodInfoList:
     def __len__(self):
         return len(self.good_info_list)
 
+    @staticmethod
+    def __is_valid(items):
+        """
+        Проверка на правильность представления данных в списке
+        :param items: list
+        :return: boolean
+        """
+        if len(items) == 5 and items[1].isdigit() \
+                and items[2].isdigit() \
+                and GoodInfo.convert_to_date(items[3]) \
+                and items[4].replace("\n", "").isdigit() \
+                and int(items[4].replace("\n", "")) > 0 \
+                and GoodInfo \
+                .convert_to_date(items[3]) >= datetime.now().date():
+            return True
+        else:
+            return False
+
     def read_from_file(self, file):
         """
         Создает GoodInfoList из файла записей формата str:int:int:str:int,
@@ -167,13 +185,7 @@ class GoodInfoList:
                 print("Такой товар уже есть! {}".format(items))
             else:
 
-                if len(items) == 5 and items[1].isdigit() \
-                        and items[2].isdigit() \
-                        and GoodInfo.convert_to_date(items[3]) \
-                        and items[4].replace("\n", "").isdigit() \
-                        and int(items[4].replace("\n", "")) > 0 \
-                        and GoodInfo \
-                        .convert_to_date(items[3]) >= datetime.now().date():
+                if self.__is_valid(items):
 
                     self.add(GoodInfo(items[0],
                                       int(items[1]),
@@ -186,6 +198,18 @@ class GoodInfoList:
                 else:
                     print('неверный формат {}'.format(items))
                     logger.error('wrong format {}'.format(items))
+
+    @staticmethod
+    def __is_goodinfo_valid(good):
+        """
+        Проверка на правильность данных в GoodInfo
+        :param good: GoodInfo
+        :return: boolean
+        """
+        if int(good[4]) > 0 and good[3] >= datetime.now().date():
+            return True
+        else:
+            return False
 
     def add(self, other):
         """
@@ -200,8 +224,12 @@ class GoodInfoList:
                 logger.error('already exists {}'.format(other))
                 print("Такой товар уже есть!")
             else:
-                # logger.info('added {}'.format(other))
-                self.good_info_list.append(other)
+                if self.__is_goodinfo_valid(other):
+                    # logger.info('added {}'.format(other))
+                    self.good_info_list.append(other)
+                else:
+                    logger.error('cant add {}'.format(other))
+                    print('неверный формат {}'.format(other))
         else:
             logger.error('cant add {}'.format(other))
             raise ValueError('{}'.format(other))
@@ -255,17 +283,8 @@ class GoodInfoList:
 
         expired_list = GoodInfoList()
         for good in self.good_info_list:
-            print(good)
-
-            print(good[3])
-            print(timedelta(days=good[4]))
-            print(good[3] + timedelta(days=good[4]))
-            print(good[3] + timedelta(days=good[4]) < datetime.now().date())
-
             if good[3] + timedelta(days=good[4]) < datetime.now().date():
                 expired_list.add(good)
-                print('ЭКСПАИРЕД')
-                print(good)
                 self.remove(good[0])
         logger.info('expired removed {}'.format(expired_list))
         return expired_list
