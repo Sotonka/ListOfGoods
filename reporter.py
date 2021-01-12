@@ -35,6 +35,7 @@ def check_data_path(data_path):
         return data_path
     else:
         print("Файл не существует")
+        # Путь по умолчанию
         return 'data/goods2.info'
 
 
