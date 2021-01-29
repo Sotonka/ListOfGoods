@@ -21,8 +21,8 @@ class GoodInfo:
     """
 
     name = None
-    count = None
     price = None
+    count = None
     delivery_date = None
     production_date = None
     shelf_life = None
@@ -49,8 +49,8 @@ class GoodInfo:
         """
 
         self.name = name
-        self.count = count
         self.price = price
+        self.count = count
         self.delivery_date = delivery_date
         self.production_date = production_date
         self.shelf_life = shelf_life
@@ -60,8 +60,8 @@ class GoodInfo:
             self.name,
             self.price,
             self.count,
-            self.delivery_date.strftime('%d/%m/%Y'),
-            self.production_date.strftime('%d/%m/%Y'),
+            self.delivery_date,
+            self.production_date,
             self.shelf_life)
 
     def __getitem__(self, key):
@@ -123,7 +123,7 @@ class GoodInfo:
             return False
 
     @staticmethod
-    def data_validation(name, price, count, delivery_date, production_date,
+    def data_validation(name, count, price, delivery_date, production_date,
                         shelf_life):
         """
         Проверяет входные параметры, и если они корректные,
@@ -139,12 +139,12 @@ class GoodInfo:
 
         price = str(price)
         count = str(count)
-        shelf_life = str(shelf_life)
+        shelf_life = str(shelf_life).replace('\n', '')
 
         if not name:
             return False
 
-        if (not price.isdigit() and not count.isdigit() and
+        if (not price.isdigit() or not count.isdigit() or
                 not shelf_life.isdigit()):
             return False
 
@@ -158,7 +158,7 @@ class GoodInfo:
                 and delivery_date and production_date
                 and datetime.now().date() >= delivery_date >= production_date):
 
-            return GoodInfo(name, price, count, delivery_date, production_date,
+            return GoodInfo(name, count, price, delivery_date, production_date,
                             shelf_life)
         else:
             return False
@@ -215,7 +215,6 @@ class GoodInfoList:
             else:
                 return self.good_info_list[key]
 
-        # ВЫДАЧА ПО КЛЮЧУ ПРОВЕРИТЬ! и в описание добавить
         elif isinstance(key, str):
             for good in self.good_info_list:
                 if good[0] == key:
@@ -237,9 +236,13 @@ class GoodInfoList:
 
         logger = logging.getLogger("loggerApp.GoodInfoList.__if_exists")
 
-        if any(map(lambda good_info:
-                   (good_info[0] == name and good_info[4] == production_date),
-                   good_info_list)):
+        if any(
+                map(
+                    lambda good_info:
+                    good_info[0] == name
+                    and str(good_info[4]) == str(production_date),
+                    good_info_list)):
+
             logger.error('Такой товар уже есть: {}, {}'
                          .format(name, production_date))
             print('Такой товар уже есть: {}, {}'.format(name, production_date))
@@ -264,24 +267,12 @@ class GoodInfoList:
                 logger.error('Не удалось добавить {}'.format(entry))
                 continue
 
-            if GoodInfoList.__if_exists(self.good_info_list,
-                                        items[0], items[4]):
-                print('Не удалось добавить {}'.format(entry))
-                logger.error('Не удалось добавить {}'.format(entry))
-            else:
-                validated_good = GoodInfo.data_validation(items[0],
-                                                          items[1],
-                                                          items[2],
-                                                          items[3],
-                                                          items[4],
-                                                          items[5])
-
-                if validated_good:
-                    self.good_info_list.append(validated_good)
-                    # logger.info('Добавлено: {}'.format(validated_good))
-                else:
-                    print('Не удалось добавить {}'.format(entry))
-                    logger.error('Не удалось добавить {}'.format(entry))
+            GoodInfoList.add(self, GoodInfo(name=items[0],
+                                            count=items[1],
+                                            price=items[2],
+                                            delivery_date=items[3],
+                                            production_date=items[4],
+                                            shelf_life=items[5]))
 
     def add(self, other):
         """
@@ -309,7 +300,7 @@ class GoodInfoList:
                                                           other[5])
 
                 if validated_good:
-                    logger.info('Добавлено: {}'.format(other))
+                    # logger.info('Добавлено: {}'.format(other))
                     self.good_info_list.append(validated_good)
 
         else:
@@ -402,7 +393,6 @@ class GoodInfoList:
                     .format(expired_list))
         return expired_list
 
-    # remove max cost декоратор?????????????????????????????????????
     def get_max_cost(self):
         """
         Возвращает список товаров с макс стоимостью
@@ -503,10 +493,10 @@ class GoodInfoList:
         elif key == 'cost':
             self.__bubble_sort(1)
             logger.info("sorted by cost")
-        elif key == '':
+        elif key == 'delivery_date':
             self.__bubble_sort(3)
             logger.info("sorted by delivery date")
-        elif key == 'shelf_life':
+        elif key == 'expiration_date':
             self.__bubble_sort(4)
             logger.info("sorted by expiration date")
         else:
@@ -565,3 +555,65 @@ class GoodInfoList:
         else:
             logger.info('{}'.format(0))
             return 0
+
+    def purchase(self, name, quantity):
+        """
+        :param name: str
+        :param quantity: int
+        :return: int or None
+        Продает заданное к-во товара, уменьшает его к-во в GoodInfoList,
+        если такого товара не существует или не зватает - возвращает None
+        """
+
+        logger = logging.getLogger("loggerApp.GoodInfoList.purchase")
+
+        purchase_amount = [0, 0]
+        dates = []
+
+        for good in self.good_info_list:
+            if good.name == name:
+                dates.append(good.production_date)
+                purchase_amount[0] += 1
+                purchase_amount[1] += good.count
+
+        if purchase_amount[0] == 0:
+            logger.info('Такого товара нет: {}'.format(name))
+            print('Такого товара нет: {}'.format(name))
+            return None
+
+        if purchase_amount[1] == 0:
+            logger.info('{}: Товар закончился'.format(name))
+            print('{}: Товар закончился'.format(name))
+            return None
+
+        if purchase_amount[1] < quantity:
+            logger.info('Товаров недостаточно')
+            print('Товаров недостаточно')
+            return None
+
+        if purchase_amount[0] == 1:
+            self[name].count -= quantity
+            earnings = quantity * good.price
+            return earnings
+
+        if purchase_amount[0] > 1:
+
+            dates.sort(reverse=False)
+            earnings = 0
+            count = purchase_amount[1] // quantity + 1
+            dates = dates[:count]
+
+            for good in self.good_info_list:
+
+                if good.name == name and good.production_date in dates \
+                        and good.production_date != dates[-1]:
+
+                    earnings += good.count * good.price
+                    quantity -= good.count
+                    good.count = 0
+
+                elif good.name == name and good.production_date == dates[-1]:
+                    earnings += quantity * good.price
+                    good.count -= quantity
+
+            return earnings

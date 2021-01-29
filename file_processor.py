@@ -19,11 +19,12 @@ class FileProcessor:
         self.file_path = ''
         self.data = None
 
-    def select_path(self, mode='user'):
+    def select_path(self, mode='user', path=''):
         """
         Получает путь до файла с данными, открывает его и возвращает список,
         сформированный из этого файла, либо пустой список при неудаче
         :param mode: str, 'user' or 'test'
+        :param path: str, only for test mode
         :return: list
         """
 
@@ -36,7 +37,10 @@ class FileProcessor:
 
         elif mode == 'test':
 
-            self.file_path = 'data/goods.info'
+            if not path:
+                self.file_path = 'data/goods.info'
+            else:
+                self.file_path = path
 
         self.file_path = self.file_path.strip(" ' ")
         self.file_path = self.file_path.strip(' " ')

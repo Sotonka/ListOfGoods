@@ -18,3 +18,4 @@
     get_quantity(self) - общее количество товаров
     get_average_price(self) - средняя цена товаров
     get_std(self) - среднее отклонение для всех цен товаров
+    purchase(self, str, int) - покупка товара
