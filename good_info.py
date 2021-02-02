@@ -56,7 +56,7 @@ class GoodInfo:
         self.shelf_life = shelf_life
 
     def __str__(self):
-        return '{}: {}руб, {}шт, {}, произеден: {} годен: {}дн'.format(
+        return '{}: {}руб, {}шт, {}, произведен: {} годен: {}дн'.format(
             self.name,
             self.price,
             self.count,
@@ -354,6 +354,8 @@ class GoodInfoList:
 
         logger = logging.getLogger("loggerApp.GoodInfoList.remove_expensive")
 
+        if len(self.good_info_list) == 0:
+            return False
         max_cost = self.get_max_cost().good_info_list[0].price
 
         removed = GoodInfoList()

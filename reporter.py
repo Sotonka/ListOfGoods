@@ -6,6 +6,7 @@ from file_processor import FileProcessor
 
 PROGRAM_MODE = 'test'
 
+
 def main():
     logs_processor = LogsProcessor()
     logs_processor.select_logs_path(PROGRAM_MODE)
