@@ -4,10 +4,11 @@ from logs_processor import LogsProcessor
 from good_info import GoodInfoList
 from file_processor import FileProcessor
 
+PROGRAM_MODE = 'test'
 
 def main():
     logs_processor = LogsProcessor()
-    logs_processor.select_logs_path(mode='test')
+    logs_processor.select_logs_path(PROGRAM_MODE)
     logging.config.dictConfig(logs_processor.get_dict_config())
 
     # logger = logging.getLogger("loggerApp")
@@ -15,7 +16,7 @@ def main():
 
     goods_list = GoodInfoList()
     file_goods = FileProcessor()
-    file_data = file_goods.select_path(mode='test')
+    file_data = file_goods.select_path(PROGRAM_MODE)
     goods_list.read_from_file(file_data)
     # file_goods.save_file()
 

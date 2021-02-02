@@ -35,7 +35,7 @@ class LogsProcessor:
 
         elif mode == 'test':
 
-            self.logs_path = '../ListOfGoods/logs'
+            self.logs_path = '../ListOfGoods/'
 
         if os.path.exists(os.path.join(self.logs_path, 'logs.log')):
 
